@@ -19,6 +19,9 @@
   (begin 
     mexpr ...))
 
+(define-syntax-rule (vec a ...)
+  (vector a ...))
+
 (define-syntax-rule (clojure:def id expr)
   (define id expr))
 
@@ -30,20 +33,11 @@
      (if (= 0 (modulo (length '(e1 e2 e3 ...)) 2))
          (if e1 e2
              (clojure:cond e3 ... :else else-expr))
-         (raise-syntax-error #f "cond requrires an even number of forms")))))
-
-;(defn election-year? [year]
-;  (zero? (rem year 4)))
-(define-syntax defn 
-  (syntax-rules ()
-    ((_ id [v ...] . body)
-     (define id
-       (lambda (v ...)
-         . body)))))
+         (raise-syntax-error #f "cond requires an even number of forms")))))
 
 (provide println
          str
-         defn
+	 vec
          (except-out (all-from-out racket) 
                      if 
                      do 
@@ -54,11 +48,13 @@
                      lambda
                      display
                      cond
+		     vector-ref
                      begin)
          (rename-out 
           (clojure:do do)
           (clojure:cond cond)
           (lambda fn)
+	  (vector-ref nth)
           (null nil)
           (clojure:def def)
           (clojure:if if)))
