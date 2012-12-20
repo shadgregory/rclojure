@@ -3,8 +3,7 @@
 (provide 
  (rename-out 
   (clj-read read)
-  (clj-read-syntax read-syntax))
- )
+  (clj-read-syntax read-syntax)))
 
 (define (clj-read in)
   (parameterize ([current-readtable (make-clj-readtable)])
@@ -17,16 +16,14 @@
 (define (make-clj-readtable)
   (make-readtable (current-readtable)
                   #\[ 'terminating-macro read-vector
-                  #\] 'terminating-macro read-vector
-		  ))
+                  #\] 'terminating-macro read-vector))
 
 (define read-vector
   (case-lambda
    [(ch in)
     (vec-read in)]
    [(ch in src line col pos)
-    (vec-read-syntax src in)
-    ]))
+    (vec-read-syntax src in)]))
 
 (define (vec-read in)
   (syntax->datum (vec-read-syntax #f in)))
@@ -95,6 +92,7 @@
 
   (for/list ((element (regexp-split #rx" +" code)))
     (if (not (string->number element))
-	element
+	(begin
+	  (regexp-replace "^\"(.*)\"$"  element "\\1"))
 	(string->number element))))
 
