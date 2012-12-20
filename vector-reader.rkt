@@ -16,7 +16,9 @@
 
 (define (make-clj-readtable)
   (make-readtable (current-readtable)
-                  #\[ 'terminating-macro read-vector))
+                  #\[ 'terminating-macro read-vector
+                  #\] 'terminating-macro read-vector
+		  ))
 
 (define read-vector
   (case-lambda
@@ -67,11 +69,30 @@
       (read-list element-list))))
 
 (define (parsed-list in)
-  (let ((code (string-append "[" (port->string in))))
-    (set! code (regexp-replace "]" code " ] "))
-    (set! code (regexp-replace* "\\[" code "[ "))
-    (set! code (regexp-replace* #rx" *$" code ""))
-     (for/list ((element (regexp-split #rx" +" code)))
-       (if (not (string->number element))
-	   element
-	   (string->number element)))))
+  (define bracket-count 1)
+  (define code "[")
+  (letrec ((get-code 
+	    (lambda ()
+	      (let ((ch (peek-char in)))
+		(cond
+		 ((equal? ch #\[)
+		  (set! bracket-count (add1 bracket-count))
+		  (set! code (string-append code (read-string 1 in))))
+		 ((equal? ch #\])
+		  (if (= 1 bracket-count)
+		      (set! code (string-append code (read-string 1 in)))
+		      (begin 
+			(set! code (string-append code (read-string 1 in)))
+			(set! bracket-count (sub1 bracket-count))
+			(get-code))))
+		 (else
+		  (set! code (string-append code (read-string 1 in)))
+		  (get-code)))))))
+    (get-code))
+  (set! code (regexp-replace "]" code " ] "))
+  (set! code (regexp-replace* "\\[" code "[ "))
+  (for/list ((element (regexp-split #rx" +" code)))
+    (if (not (string->number element))
+	element
+	(string->number element))))
+
