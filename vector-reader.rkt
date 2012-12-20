@@ -77,7 +77,8 @@
 		(cond
 		 ((equal? ch #\[)
 		  (set! bracket-count (add1 bracket-count))
-		  (set! code (string-append code (read-string 1 in))))
+		  (set! code (string-append code (read-string 1 in)))
+		  (get-code))
 		 ((equal? ch #\])
 		  (if (= 1 bracket-count)
 		      (set! code (string-append code (read-string 1 in)))
@@ -91,6 +92,7 @@
     (get-code))
   (set! code (regexp-replace "]" code " ] "))
   (set! code (regexp-replace* "\\[" code "[ "))
+
   (for/list ((element (regexp-split #rx" +" code)))
     (if (not (string->number element))
 	element

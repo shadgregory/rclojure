@@ -1,9 +1,12 @@
 #lang reader "clojure.rkt"
 
-(println "hello")
+(println "hello\n")
 
 (eq? (= 1 1) true)
 
 (if true "yes")
 
-(display (vector-ref 1 [1 2 3]))
+(println [1 2 3])
+(newline)
+
+(println "hello again\n")
