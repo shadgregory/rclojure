@@ -1,18 +1,10 @@
 #lang racket
 (require syntax/readerr)
 (provide 
- println
  (rename-out 
   (clj-read read)
   (clj-read-syntax read-syntax))
  )
-
-(define-syntax-rule (clojure:do mexpr ...)
-  (begin 
-    mexpr ...))
-
-(define (println output-str)
-  (display output-str))
 
 (define (clj-read in)
   (parameterize ([current-readtable (make-clj-readtable)])
