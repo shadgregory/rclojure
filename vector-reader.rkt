@@ -91,9 +91,6 @@
   (set! code (regexp-replace* "\\[" code "[ "))
 
   (for/list ((element (regexp-split #rx" +" code)))
-    (display (string-append "element : " element "\n"))
-    (display (regexp-match #rx"^\".*\"$" element))
-    (newline)
     (cond
      ((string->number element)
       (string->number element))
