@@ -35,7 +35,8 @@
     (letrec ((read-list 
 	      (lambda (lst)
 		(cond
-		 ((empty? lst) return-vector)
+		 ((empty? lst) 
+		  return-vector)
 		 ((equal? (car lst) "[")
 		  (set! bracket-count (add1 bracket-count))
 		  (read-list (cdr lst)))
@@ -47,7 +48,7 @@
 		  (read-list (cdr lst)))
 		 ((> bracket-count 1)
 		  (if (vector? (vector-ref return-vector 
-					   (sub1 (vector-length return-vector)))) 
+					   (sub1 (vector-length return-vector))))
 		      (set! return-vector  
 			    (vector
 			     (vector-take return-vector 
@@ -56,7 +57,7 @@
 			      (vector-ref return-vector 
 					  (sub1 
 					   (vector-length return-vector)))
-			      (vector (car lst))))) 
+			      (vector (car lst)))))
 		      (set! return-vector 
 			    (vector
 			     return-vector
@@ -96,5 +97,7 @@
       (string->number element))
      ((regexp-match #rx"^\".*\"$" element)
       (regexp-replace #rx"^\"(.*)\"$" element "\\1"))
-     (else element))))
+     ((equal? element "]") element)
+     ((equal? element "[") element)
+     (else (string->symbol element)))))
 

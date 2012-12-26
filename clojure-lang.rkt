@@ -25,6 +25,12 @@
 (define-syntax-rule (clojure:def id expr)
   (define id expr))
 
+(define-syntax-rule (fn #(arg ...) body ...)
+  (#%plain-lambda (arg ...)
+		  (begin
+		    body ...
+		    )))
+
 (define-syntax clojure:cond
   (syntax-rules (:else)
     ((_ :else else-expr)
@@ -38,6 +44,7 @@
 (provide println
          str
 	 vec
+	 fn
          (except-out (all-from-out racket) 
                      if 
                      do 
@@ -53,7 +60,6 @@
          (rename-out 
           (clojure:do do)
           (clojure:cond cond)
-          (lambda fn)
 	  (vector-ref nth)
           (null nil)
           (clojure:def def)
