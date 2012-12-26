@@ -27,9 +27,11 @@
 
 (define-syntax-rule (fn #(arg ...) body ...)
   (#%plain-lambda (arg ...)
-		  (begin
-		    body ...
-		    )))
+		  (begin body ...)))
+
+(define-syntax-rule (defn id #(arg ...) body ...)
+  (define id (#%plain-lambda (arg ...)
+			     (begin body ...))))
 
 (define-syntax clojure:cond
   (syntax-rules (:else)
@@ -41,10 +43,20 @@
              (clojure:cond e3 ... :else else-expr))
          (raise-syntax-error #f "cond requires an even number of forms")))))
 
+(define-syntax clojure:count
+  (syntax-rules ()
+    ((_ #(e ...))
+     (vector-length #(e ...)))
+    ((_ coll)
+     (if (string? coll) 
+	 (length (string->list coll))
+	 (length coll)))))
+
 (provide println
          str
 	 vec
 	 fn
+	 defn
          (except-out (all-from-out racket) 
                      if 
                      do 
@@ -53,6 +65,8 @@
                      null
                      cond
                      lambda
+		     length
+		     count
                      display
                      cond
 		     vector-ref
@@ -60,6 +74,7 @@
          (rename-out 
           (clojure:do do)
           (clojure:cond cond)
+	  (clojure:count count)
 	  (vector-ref nth)
           (null nil)
           (clojure:def def)
