@@ -13,7 +13,6 @@
     ((_ test then else)
      (if test then else))))
 
-
 (define-syntax-rule (clojure:do mexpr ...)
   (begin 
     mexpr ...))
@@ -70,6 +69,7 @@
                      cdr
                      null
 		     sub1
+		     add1
                      cond
                      lambda
 		     length
@@ -84,5 +84,6 @@
 	  (vector-ref nth)
           (null nil)
 	  (sub1 dec)
+	  (add1 inc)
           (clojure:def def)
           (clojure:if if)))
