@@ -52,10 +52,18 @@
 	 (length (string->list coll))
 	 (length coll)))))
 
+(define-syntax pop
+  (syntax-rules ()
+    ((_ #(a ...))
+     (vector-take #(a ...) (sub1 (vector-length #(a ...)))))
+    ((_ '(a ...))
+     (cdr '(a ...)))))
+
 (provide println
          str
 	 vec
 	 fn
+	 pop
 	 defn
          (except-out (all-from-out racket) 
                      if 

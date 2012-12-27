@@ -10,3 +10,7 @@
 (newline)
 
 (println "hello again\n")
+
+[x y]
+(pop [1 2 3]) ;[1 2]
+(pop '(1 2 3)) ;(2 3)
