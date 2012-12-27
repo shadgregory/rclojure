@@ -15,8 +15,7 @@
 
 (define (make-clj-readtable)
   (make-readtable (current-readtable)
-                  #\[ 'terminating-macro read-vector
-                  #\] 'terminating-macro read-vector))
+                  #\[ 'terminating-macro read-vector))
 
 (define read-vector
   (case-lambda
