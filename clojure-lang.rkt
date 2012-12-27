@@ -6,14 +6,13 @@
 (define-syntax-rule (str string1 ...)
   (string-append string1 ...))
 
-(define (clojure:if stmt branch1 (branch2 '()))
-  (if (not branch2)
-      (if (eq? stmt #t)
-          branch1
-          null)
-      (if (eq? stmt #t)
-          branch1
-          branch2)))
+(define-syntax clojure:if
+  (syntax-rules ()
+    ((_ test then)
+     (if test then null))
+    ((_ test then else)
+     (if test then else))))
+
 
 (define-syntax-rule (clojure:do mexpr ...)
   (begin 
@@ -30,8 +29,7 @@
 		  (begin body ...)))
 
 (define-syntax-rule (defn id #(arg ...) body ...)
-  (define id (#%plain-lambda (arg ...)
-			     (begin body ...))))
+  (define id (fn #(arg ...) body ...)))
 
 (define-syntax clojure:cond
   (syntax-rules (:else)
@@ -71,12 +69,12 @@
                      car
                      cdr
                      null
+		     sub1
                      cond
                      lambda
 		     length
 		     count
                      display
-                     cond
 		     vector-ref
                      begin)
          (rename-out 
@@ -85,5 +83,6 @@
 	  (clojure:count count)
 	  (vector-ref nth)
           (null nil)
+	  (sub1 dec)
           (clojure:def def)
           (clojure:if if)))
