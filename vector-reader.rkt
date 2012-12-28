@@ -27,6 +27,12 @@
 (define (vec-read in)
   (syntax->datum (vec-read-syntax #f in)))
 
+(define vec-append
+  (lambda (v a)
+    (if (> (vector-length v) 0)
+	(vector (vector->values v) a)
+	(vector a))))
+
 (define (vec-read-syntax src in)
   (let* ((element-list (parsed-list in))
 	 (bracket-count 0)
@@ -37,6 +43,9 @@
 		 ((empty? lst) 
 		  return-vector)
 		 ((equal? (car lst) "[")
+		  (cond
+		   ((> bracket-count 0)
+		    (set! return-vector (vec-append return-vector #()))))
 		  (set! bracket-count (add1 bracket-count))
 		  (read-list (cdr lst)))
 		 ((equal? (car lst) "]")
@@ -46,17 +55,17 @@
 		  (set! return-vector (vector-append return-vector (vector (car lst))))
 		  (read-list (cdr lst)))
 		 ((> bracket-count 1)
-		  (if (vector? (vector-ref return-vector 
-					   (sub1 (vector-length return-vector))))
+		  (if (vector? (vector-ref 
+				return-vector 
+				(sub1 (vector-length return-vector))))
 		      (set! return-vector  
-			    (vector
+			    (vec-append
 			     (vector-take return-vector 
 					  (sub1 (vector-length return-vector)))
-			     (vector-append 
+			     (vec-append
 			      (vector-ref return-vector 
-					  (sub1 
-					   (vector-length return-vector)))
-			      (vector (car lst)))))
+					  (sub1 (vector-length return-vector)))
+			      (car lst))))
 		      (set! return-vector 
 			    (vector
 			     return-vector
