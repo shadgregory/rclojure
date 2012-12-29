@@ -40,6 +40,19 @@
              (clojure:cond e3 ... :else else-expr))
          (raise-syntax-error #f "cond requires an even number of forms")))))
 
+(define-syntax conj
+  (syntax-rules ()
+    ((_ #(e ...) x ...)
+     (vector e ... x ...))
+    ((_ '(e ...) x ...)
+     (list x ... e ...))
+    ((_ coll x ...)
+     (cond
+      ((vector? coll)
+       (vector-append coll #(x ...)))
+      ((list? coll)
+       (append '(x ...) coll))))))
+
 (define-syntax clojure:count
   (syntax-rules ()
     ((_ #(e ...))
@@ -61,6 +74,7 @@
 	 vec
 	 fn
 	 pop
+	 conj
 	 defn
          (except-out (all-from-out racket) 
                      if 
