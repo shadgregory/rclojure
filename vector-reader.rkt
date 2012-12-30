@@ -29,9 +29,9 @@
 
 (define vec-append
   (lambda (v a)
-    (if (> (vector-length v) 0)
-	(vector (vector->values v) a)
-	(vector a))))
+    (let ((new-v (for/vector #:length (add1 (vector-length v)) ((element v)) element)))
+      (vector-set! new-v (sub1 (vector-length new-v)) a)
+      new-v)))
 
 (define (vec-read-syntax src in)
   (let* ((element-list (parsed-list in))
