@@ -67,9 +67,7 @@
 					  (sub1 (vector-length return-vector)))
 			      (car lst))))
 		      (set! return-vector 
-			    (vector
-			     return-vector
-			     (vector (car lst)))))
+			    (vector return-vector (vector (car lst)))))
 		  (read-list (cdr lst)))
 		 ((= bracket-count 0) return-vector)))))
       (read-list element-list))))

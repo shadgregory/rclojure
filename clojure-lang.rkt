@@ -77,20 +77,21 @@
 	 conj
 	 defn
          (except-out (all-from-out racket) 
-                     if 
-                     do 
+		     add1
+                     begin
                      car
                      cdr
-                     null
-		     sub1
-		     add1
                      cond
-                     lambda
-		     length
 		     count
                      display
-		     vector-ref
-                     begin)
+		     do 
+                     if 
+                     lambda
+		     length
+                     null
+		     sub1
+		     vector-copy
+		     vector-ref)
          (rename-out 
           (clojure:do do)
           (clojure:cond cond)
@@ -99,5 +100,6 @@
           (null nil)
 	  (sub1 dec)
 	  (add1 inc)
+	  (vector-copy subvec)
           (clojure:def def)
           (clojure:if if)))
