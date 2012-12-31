@@ -95,7 +95,9 @@
                      if 
                      lambda
 		     length
+		     modulo
                      null
+		     remainder
 		     sub1
 		     vector-copy
 		     vector-ref)
@@ -107,6 +109,8 @@
           (null nil)
 	  (sub1 dec)
 	  (add1 inc)
+	  (remainder rem)
+	  (modulo mod)
 	  (vector-copy subvec)
           (clojure:def def)
           (clojure:if if)))
