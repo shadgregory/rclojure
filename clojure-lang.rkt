@@ -20,6 +20,12 @@
 (define-syntax-rule (vec a ...)
   (vector a ...))
 
+(define-syntax-rule (get vec key)
+  (cond
+   ((> key (sub1 (vector-length vec))) null)
+   (else 
+    (vector-ref vec key))))
+
 (define-syntax-rule (clojure:def id expr)
   (define id expr))
 
@@ -73,6 +79,7 @@
          str
 	 vec
 	 fn
+	 get
 	 pop
 	 conj
 	 defn
