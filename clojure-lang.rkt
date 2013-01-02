@@ -1,7 +1,13 @@
 #lang racket
 
-(define (println input-string)
-  (display input-string)) 
+(define-syntax println
+  (syntax-rules ()
+    ((_ str ...)
+     (begin 
+       (for-each (lambda (arg)
+                   (display arg))
+                 '(str ...))
+       (newline)))))
 
 (define-syntax-rule (str string1 ...)
   (string-append string1 ...))
