@@ -94,7 +94,7 @@
 		  (set! code (string-append code (read-string 1 in)))
 		  (get-code)))))))
     (get-code))
-  (set! code (regexp-replace* "]" code " ]"))
+  (set! code (regexp-replace* "]" code " ] "))
   (set! code (regexp-replace* "\\[" code "[ "))
 
   (for/list ((element (regexp-split #rx" +" code)))
