@@ -6,7 +6,7 @@
      (begin 
        (for-each (lambda (arg)
                    (display arg))
-                 '(str ...))
+                 `(,str ...))
        (newline)))))
 
 (define-syntax-rule (str string1 ...)
@@ -41,6 +41,13 @@
 
 (define-syntax-rule (defn id #(arg ...) body ...)
   (define id (fn #(arg ...) body ...)))
+
+;; wrong, still can't figure out how to make it work with a vector
+(define-syntax-rule (letfn ((id #(arg ...) body1 ...) ...) . body2)
+  (let ()
+    (define id (fn #(arg ...) body1 ...))
+    ...
+    (let () . body2)))
 
 (define-syntax clojure:cond
   (syntax-rules (:else)
@@ -89,6 +96,7 @@
 	 pop
 	 conj
 	 defn
+         letfn
          (except-out (all-from-out racket) 
 		     add1
                      begin
