@@ -49,6 +49,29 @@
     ...
     (let () . body2)))
 
+;; (define-syntax-rule (letfn #(funcs ...) . body)
+;;   (let ()
+;;     (for-each (lambda (arg)
+;; 		(cond
+;; 		 ((vector? arg)
+;; 		  (display "vector : ")
+;; 		  (displayln arg)
+;; 		  )
+;; 		 ((regexp-match #px"^[ \t\n\r]+$" (symbol->string arg))
+;; 		  (displayln "whitespace")
+;; 		  )
+;; 		 ((symbol? arg)
+;; 		  (display "symbol : ")
+;; 		  (displayln arg)
+;; 		  )
+;; 		 )
+;; 		)
+;; 	      (vector->list #(funcs ...))
+;; 	      )
+;;     (let () . body)
+;;     )
+;;   )
+
 (define-syntax clojure:cond
   (syntax-rules (:else)
     ((_ :else else-expr)
