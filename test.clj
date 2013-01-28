@@ -29,3 +29,10 @@
 (check-equal? 0 (mod 10 -1))
 (check-equal? 4 (mod 10 6))
 (check-equal? 3 (mod -2 5))
+
+;; (letfn [(twice [x]
+;;           (* x 2))
+;;         (six-times [y]
+;;           (* (twice y) 3))]
+;;   (println "Twice 15 =" (twice 15))
+;;   (println "Six times 15 =" (six-times 15)))
