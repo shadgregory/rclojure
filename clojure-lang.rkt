@@ -1,9 +1,14 @@
 #lang racket
 
+(require data/queue)
+(require syntax/to-string)
+(define-namespace-anchor a)
+(define ns (namespace-anchor->namespace a))
+
 (define-syntax println
   (syntax-rules ()
     ((_ str ...)
-     (begin 
+     (begin
        (for-each (lambda (arg)
                    (display arg))
                  `(,str ...))
@@ -20,7 +25,7 @@
      (if test then else))))
 
 (define-syntax-rule (clojure:do mexpr ...)
-  (begin 
+  (begin
     mexpr ...))
 
 (define-syntax-rule (vec a ...)
@@ -29,7 +34,7 @@
 (define-syntax-rule (get vec key)
   (cond
    ((> key (sub1 (vector-length vec))) null)
-   (else 
+   (else
     (vector-ref vec key))))
 
 (define-syntax-rule (clojure:def id expr)
@@ -42,35 +47,64 @@
 (define-syntax-rule (defn id #(arg ...) body ...)
   (define id (fn #(arg ...) body ...)))
 
-;; wrong, still can't figure out how to make it work with a vector
-(define-syntax-rule (letfn ((id #(arg ...) body1 ...) ...) . body2)
-  (let ()
-    (define id (fn #(arg ...) body1 ...))
-    ...
-    (let () . body2)))
-
-;; (define-syntax-rule (letfn #(funcs ...) . body)
-;;   (let ()
-;;     (for-each (lambda (arg)
-;; 		(cond
-;; 		 ((vector? arg)
-;; 		  (display "vector : ")
-;; 		  (displayln arg)
-;; 		  )
-;; 		 ((regexp-match #px"^[ \t\n\r]+$" (symbol->string arg))
-;; 		  (displayln "whitespace")
-;; 		  )
-;; 		 ((symbol? arg)
-;; 		  (display "symbol : ")
-;; 		  (displayln arg)
-;; 		  )
-;; 		 )
-;; 		)
-;; 	      (vector->list #(funcs ...))
-;; 	      )
-;;     (let () . body)
-;;     )
-;;   )
+(define-syntax-rule (letfn #(funcs ...) . body)
+  (let ((q (make-queue))
+        (paren-count 0)
+        (in-func #f))
+    (for-each (lambda (arg)
+                (cond
+                 ((vector? arg)
+                  (enqueue! q "(")
+                  (set! paren-count (add1 paren-count))
+                  (set! in-func #t)
+                  (enqueue! q "lambda")
+                  (enqueue! q "(")
+                  (set! paren-count (add1 paren-count))
+                  (for ((x (in-vector arg)))
+                    (enqueue! q (symbol->string x)))
+                  (enqueue! q ")")
+                  (set! paren-count (sub1 paren-count)))
+                 ((regexp-match #px"^[ \t\n\r]+$" (symbol->string arg))
+                  'whitespace)
+                 ((symbol? arg)
+                  (let ((arg-str (symbol->string arg)))
+                    (set! arg-str (regexp-replace* "\\(" arg-str " ( "))
+                    (set! arg-str (regexp-replace* "\\)" arg-str " ) "))
+                    (set! arg-str (regexp-replace* "^[ ]" arg-str ""))
+                        (for ((element (regexp-split #rx" +" arg-str)))
+                          (cond
+                           ((equal? element "(")
+                            (set! paren-count (add1 paren-count)))
+                           ((equal? element ")")
+                            (set! paren-count (sub1 paren-count))))
+                          (enqueue! q element)
+                          (if (and (equal? element "(") (= paren-count 1) (not in-func))
+                              (enqueue! q "define")
+                              'nothing
+                              )
+                          (cond
+                           ((and (= paren-count 2) in-func)
+                            (enqueue! q ")")
+                            (set! paren-count (sub1 paren-count))
+                            (set! in-func #f)))
+                          (if (and (= paren-count 2) in-func)
+                              (begin
+                                (enqueue! q ")")
+                                (set! paren-count (sub1 paren-count))
+                                (set! in-func #f))
+                              'wecool))))))
+                  (vector->list #(funcs ...)))
+        (letrec ((create-str (lambda (the-queue str)
+                               (cond
+                                ((queue-empty? the-queue)
+                                 (eval (read (open-input-string (string-append
+                                                                 "(begin " str ")"
+                                                                 ))) ns)
+                                 (eval '(let () . body) ns))
+                                (else
+                                 (set! str (string-append str " " (dequeue! q)))
+                                 (create-str q str))))))
+          (create-str q "" ))))
 
 (define-syntax clojure:cond
   (syntax-rules (:else)
@@ -100,7 +134,7 @@
     ((_ #(e ...))
      (vector-length #(e ...)))
     ((_ coll)
-     (if (string? coll) 
+     (if (string? coll)
 	 (length (string->list coll))
 	 (length coll)))))
 
@@ -120,7 +154,7 @@
 	 conj
 	 defn
          letfn
-         (except-out (all-from-out racket) 
+         (except-out (all-from-out racket)
 		     add1
                      begin
                      car
@@ -128,8 +162,8 @@
                      cond
 		     count
                      display
-		     do 
-                     if 
+		     do
+                     if
                      lambda
 		     length
 		     modulo
@@ -138,7 +172,7 @@
 		     sub1
 		     vector-copy
 		     vector-ref)
-         (rename-out 
+         (rename-out
           (clojure:do do)
           (clojure:cond cond)
 	  (clojure:count count)
