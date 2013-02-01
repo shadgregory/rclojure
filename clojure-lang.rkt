@@ -47,6 +47,25 @@
 (define-syntax-rule (defn id #(arg ...) body ...)
   (define id (fn #(arg ...) body ...)))
 
+(define-syntax clojure:inner-let
+  (syntax-rules () 
+    ((_ (id v) . body)
+     (begin
+       (define id v)
+       (clojure:inner-let () . body)))
+     ((_ (id v id2 ...) . body)
+      (begin
+        (define id v)
+        (clojure:inner-let (id2 ...) . body)
+        ))
+    ((_ () . body)
+     (let () . body))))
+
+(define-syntax-rule (clojure:let #(bindings ...) . body)
+  (let ()
+    (clojure:inner-let (bindings ...) . body)
+    ))
+
 (define-syntax-rule (letfn #(funcs ...) . body)
   (let ((q (make-queue))
         (paren-count 0)
@@ -57,7 +76,7 @@
                   (enqueue! q "(")
                   (set! paren-count (add1 paren-count))
                   (set! in-func #t)
-                  (enqueue! q "lambda")
+                  (enqueue! q "#%plain-lambda")
                   (enqueue! q "(")
                   (set! paren-count (add1 paren-count))
                   (for ((x (in-vector arg)))
@@ -166,6 +185,7 @@
                      if
                      lambda
 		     length
+                     let
 		     modulo
                      null
 		     remainder
@@ -176,6 +196,7 @@
           (clojure:do do)
           (clojure:cond cond)
 	  (clojure:count count)
+          (clojure:let let)
 	  (vector-ref nth)
           (null nil)
 	  (sub1 dec)
