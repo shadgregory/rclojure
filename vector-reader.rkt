@@ -1,5 +1,6 @@
 #lang racket
 (require syntax/readerr)
+(require data/queue)
 (provide 
  (rename-out 
   (clj-read read)
@@ -36,24 +37,37 @@
 (define (vec-read-syntax src in)
   (let* ((element-list (parsed-list in))
 	 (bracket-count 0)
+         (in-list #f)
 	 (return-vector #()))
     (letrec ((read-list 
-	      (lambda (lst)
+	      (lambda (lst q)
 		(cond
 		 ((empty? lst) 
 		  return-vector)
+                 ((and (equal? (car lst) "(") (equal? (second lst) 'list))
+                  (set! in-list #t)
+                  (enqueue! q 'list)
+                  (read-list (cdr (cdr lst)) q)
+                  )
+                 ((and in-list (equal? (car lst) ")"))
+                  (set! in-list #f)
+                  (set! return-vector (vec-append return-vector (queue->list q)))
+                  (read-list (cdr lst) (make-queue)))
+                 ((equal? in-list #t)
+                  (enqueue! q (car lst))
+                  (read-list (cdr lst) q))
 		 ((equal? (car lst) "[")
 		  (cond
 		   ((> bracket-count 0)
 		    (set! return-vector (vec-append return-vector #()))))
 		  (set! bracket-count (add1 bracket-count))
-		  (read-list (cdr lst)))
+		  (read-list (cdr lst) q))
 		 ((equal? (car lst) "]")
 		  (set! bracket-count (sub1 bracket-count))
-		  (read-list (cdr lst)))
+		  (read-list (cdr lst) q))
 		 ((= bracket-count 1) 
 		  (set! return-vector (vector-append return-vector (vector (car lst))))
-		  (read-list (cdr lst)))
+		  (read-list (cdr lst) q))
 		 ((> bracket-count 1)
 		  (if (vector? (vector-ref 
 				return-vector 
@@ -68,9 +82,9 @@
 			      (car lst))))
 		      (set! return-vector 
 			    (vector return-vector (vector (car lst)))))
-		  (read-list (cdr lst)))
+		  (read-list (cdr lst) q))
 		 ((= bracket-count 0) return-vector)))))
-      (read-list element-list))))
+      (read-list element-list (make-queue)))))
 
 (define (parsed-list in)
   (define bracket-count 1)
@@ -96,6 +110,9 @@
     (get-code))
   (set! code (regexp-replace* "]" code " ] "))
   (set! code (regexp-replace* "\\[" code "[ "))
+  (set! code (regexp-replace* "'\\(" code "(list "))
+  (set! code (regexp-replace* "\\)" code " ) "))
+  (set! code (regexp-replace* "\\(" code "( "))
 
   (for/list ((element (regexp-split #rx" +" code)))
     (cond
@@ -105,5 +122,7 @@
       (regexp-replace #rx"^\"(.*)\"$" element "\\1"))
      ((equal? element "]") element)
      ((equal? element "[") element)
+     ((equal? element ")") element)
+     ((equal? element "(") element)
      (else (string->symbol element)))))
 

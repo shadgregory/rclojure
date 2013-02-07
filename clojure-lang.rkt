@@ -63,8 +63,7 @@
 
 (define-syntax-rule (clojure:let #(bindings ...) . body)
   (let ()
-    (clojure:inner-let (bindings ...) . body)
-    ))
+    (clojure:inner-let (bindings ...) . body)))
 
 (define-syntax-rule (letfn #(funcs ...) . body)
   (let ((q (make-queue))

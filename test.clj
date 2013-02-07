@@ -18,9 +18,7 @@
 (check-equal? [4 5] (subvec [12 3 4 5 6 7] 2 4))
 (let [v [1 2 3]]
   (check-equal? [1 2 3 4] (conj v 4)))
-(def my-list (list 1 2 3))
-;;new let cannot handle lists properly
-(let [l my-list]
+(let [l '(1 2 3)]
   (check-equal? '(4 1 2 3) (conj l 4)))
 (check-equal? 2 (get [1 2 3] 1))
 (check-equal? nil (get [1 2 3] 5))
@@ -32,9 +30,9 @@
 (check-equal? 4 (mod 10 6))
 (check-equal? 3 (mod -2 5))
 
-(letfn [(twice [x]
-          (* x 2))
-        (six-times [y]
-          (* (twice y) 3))]
-  (println "Twice 15 = " (twice 15))
-  (println "Six times 15 = " (six-times 15)))
+;; (letfn [(twice [x]
+;;           (* x 2))
+;;         (six-times [y]
+;;           (* (twice y) 3))]
+;;   (println "Twice 15 = " (twice 15))
+;;   (println "Six times 15 = " (six-times 15)))
