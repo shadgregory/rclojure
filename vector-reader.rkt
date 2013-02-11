@@ -1,4 +1,6 @@
 #lang racket
+(define-namespace-anchor a)
+(define ns (namespace-anchor->namespace a))
 (require syntax/readerr)
 (require data/queue)
 (provide 
@@ -28,16 +30,30 @@
 (define (vec-read in)
   (syntax->datum (vec-read-syntax #f in)))
 
+(define (atom? x) 
+  (not (or (pair? x) (null? x) (vector? x))))
+
 (define vec-append
   (lambda (v a)
     (let ((new-v (for/vector #:length (add1 (vector-length v)) ((element v)) element)))
       (vector-set! new-v (sub1 (vector-length new-v)) a)
       new-v)))
 
+(define insert-list 
+  (lambda (lst)
+    (cond
+     ((empty? lst) '())
+     ((atom? (car lst))
+      (cons (car lst) (insert-list (cdr lst))))
+     ((pair? (car lst))
+      (cons (cons 'list (car lst)) (insert-list (cdr lst)))))))
+
 (define (vec-read-syntax src in)
   (let* ((element-list (parsed-list in))
 	 (bracket-count 0)
+	 (paren-count 0)
          (in-list #f)
+	 (list-string "")
 	 (return-vector #()))
     (letrec ((read-list 
 	      (lambda (lst q)
@@ -46,14 +62,35 @@
 		  return-vector)
                  ((and (equal? (car lst) "(") (equal? (second lst) 'list))
                   (set! in-list #t)
+		  (set! paren-count (add1 paren-count))
                   (enqueue! q 'list)
+		  (set! list-string (string-append list-string " (list "))
                   (read-list (cdr (cdr lst)) q)
                   )
                  ((and in-list (equal? (car lst) ")"))
-                  (set! in-list #f)
-                  (set! return-vector (vec-append return-vector (queue->list q)))
+		  (set! paren-count (sub1 paren-count))
+		  (set! list-string (string-append list-string ")"))
+		  (cond
+		   ((= 0 paren-count)
+		    (set! return-vector (vec-append 
+					 return-vector  
+					 (cons 'list 
+					       (insert-list (eval (read 
+								   (open-input-string list-string))
+								  ns)))))))
                   (read-list (cdr lst) (make-queue)))
-                 ((equal? in-list #t)
+                 ((> paren-count 0)
+		  (cond
+		   ((string? (car lst))
+		    (set! list-string (string-append list-string " " (car lst) " "))
+		    )
+		   ((symbol? (car lst))
+		    (set! list-string (string-append list-string (symbol->string (car lst))))
+		    )
+		   ((number? (car lst))
+		    (set! list-string (string-append list-string " "(number->string (car lst)) " "))
+		    )
+		   )
                   (enqueue! q (car lst))
                   (read-list (cdr lst) q))
 		 ((equal? (car lst) "[")
@@ -83,7 +120,8 @@
 		      (set! return-vector 
 			    (vector return-vector (vector (car lst)))))
 		  (read-list (cdr lst) q))
-		 ((= bracket-count 0) return-vector)))))
+		 ((= bracket-count 0)
+		  return-vector)))))
       (read-list element-list (make-queue)))))
 
 (define (parsed-list in)

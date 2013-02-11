@@ -19,7 +19,11 @@
 (let [v [1 2 3]]
   (check-equal? [1 2 3 4] (conj v 4)))
 (let [l '(1 2 3)]
-  (check-equal? '(4 1 2 3) (conj l 4)))
+   (check-equal? '(4 1 2 3) (conj l 4)))
+(let [l (list 1 (list 2 3) 4)]
+  (check-equal? 1 (first l)))
+(let [l '(1 '(2 3) 4)]
+  (check-equal? 1 (first l)))
 (check-equal? 2 (get [1 2 3] 1))
 (check-equal? nil (get [1 2 3] 5))
 (check-equal? 1 (rem 10 9))

@@ -50,14 +50,12 @@
 (define-syntax clojure:inner-let
   (syntax-rules () 
     ((_ (id v) . body)
-     (begin
-       (define id v)
-       (clojure:inner-let () . body)))
+     (let ((id v))
+       (clojure:inner-let () . body)
+       ))
      ((_ (id v id2 ...) . body)
-      (begin
-        (define id v)
-        (clojure:inner-let (id2 ...) . body)
-        ))
+      (let ((id v))
+	(clojure:inner-let (id2 ...) . body)))
     ((_ () . body)
      (let () . body))))
 
