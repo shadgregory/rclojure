@@ -75,22 +75,21 @@
 		    (set! return-vector (vec-append 
 					 return-vector  
 					 (cons 'list 
-					       (insert-list (eval (read 
-								   (open-input-string list-string))
-								  ns)))))))
+					       (insert-list (eval 
+							     (read 
+							      (open-input-string list-string))
+							     ns)))))))
                   (read-list (cdr lst) (make-queue)))
+
                  ((> paren-count 0)
 		  (cond
 		   ((string? (car lst))
-		    (set! list-string (string-append list-string " " (car lst) " "))
-		    )
+		    (set! list-string (string-append list-string " " (car lst) " ")))
 		   ((symbol? (car lst))
-		    (set! list-string (string-append list-string (symbol->string (car lst))))
-		    )
+		    (set! list-string (string-append list-string (symbol->string (car lst)))))
 		   ((number? (car lst))
-		    (set! list-string (string-append list-string " "(number->string (car lst)) " "))
-		    )
-		   )
+		    (set! list-string (string-append list-string " "
+						     (number->string (car lst)) " "))))
                   (enqueue! q (car lst))
                   (read-list (cdr lst) q))
 		 ((equal? (car lst) "[")
@@ -121,7 +120,8 @@
 			    (vector return-vector (vector (car lst)))))
 		  (read-list (cdr lst) q))
 		 ((= bracket-count 0)
-		  return-vector)))))
+		  return-vector)
+		 ))))
       (read-list element-list (make-queue)))))
 
 (define (parsed-list in)
