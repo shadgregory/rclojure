@@ -49,80 +49,39 @@
       (cons (cons 'list (car lst)) (insert-list (cdr lst)))))))
 
 (define (vec-read-syntax src in)
-  (let* ((element-list (parsed-list in))
-	 (bracket-count 0)
-	 (paren-count 0)
-         (in-list #f)
-	 (list-string "")
-	 (return-vector #()))
-    (letrec ((read-list 
-	      (lambda (lst q)
-		(cond
-		 ((empty? lst) 
-		  return-vector)
-                 ((and (equal? (car lst) "(") (equal? (second lst) 'list))
-                  (set! in-list #t)
-		  (set! paren-count (add1 paren-count))
-                  (enqueue! q 'list)
-		  (set! list-string (string-append list-string " (list "))
-                  (read-list (cdr (cdr lst)) q)
-                  )
-                 ((and in-list (equal? (car lst) ")"))
-		  (set! paren-count (sub1 paren-count))
-		  (set! list-string (string-append list-string ")"))
-		  (cond
-		   ((= 0 paren-count)
-		    (set! return-vector (vec-append 
-					 return-vector  
-					 (cons 'list 
-					       (insert-list (eval 
-							     (read 
-							      (open-input-string list-string))
-							     ns)))))))
-                  (read-list (cdr lst) (make-queue)))
+  (let ((code (parsed-string in)))
+    (eval (read (open-input-string code)) ns)))
 
-                 ((> paren-count 0)
-		  (cond
-		   ((string? (car lst))
-		    (set! list-string (string-append list-string " " (car lst) " ")))
-		   ((symbol? (car lst))
-		    (set! list-string (string-append list-string (symbol->string (car lst)))))
-		   ((number? (car lst))
-		    (set! list-string (string-append list-string " "
-						     (number->string (car lst)) " "))))
-                  (enqueue! q (car lst))
-                  (read-list (cdr lst) q))
-		 ((equal? (car lst) "[")
-		  (cond
-		   ((> bracket-count 0)
-		    (set! return-vector (vec-append return-vector #()))))
+(define (parsed-string in) 
+  (define bracket-count 1) 
+  (define code "[")
+  (letrec ((get-code 
+	    (lambda ()
+	      (let ((ch (peek-char in)))
+		(cond
+		 ((equal? ch #\[)
 		  (set! bracket-count (add1 bracket-count))
-		  (read-list (cdr lst) q))
-		 ((equal? (car lst) "]")
-		  (set! bracket-count (sub1 bracket-count))
-		  (read-list (cdr lst) q))
-		 ((= bracket-count 1) 
-		  (set! return-vector (vector-append return-vector (vector (car lst))))
-		  (read-list (cdr lst) q))
-		 ((> bracket-count 1)
-		  (if (vector? (vector-ref 
-				return-vector 
-				(sub1 (vector-length return-vector))))
-		      (set! return-vector  
-			    (vec-append
-			     (vector-take return-vector 
-					  (sub1 (vector-length return-vector)))
-			     (vec-append
-			      (vector-ref return-vector 
-					  (sub1 (vector-length return-vector)))
-			      (car lst))))
-		      (set! return-vector 
-			    (vector return-vector (vector (car lst)))))
-		  (read-list (cdr lst) q))
-		 ((= bracket-count 0)
-		  return-vector)
-		 ))))
-      (read-list element-list (make-queue)))))
+		  (set! code (string-append code (read-string 1 in)))
+		  (get-code))
+		 ((equal? ch #\])
+		  (if (= 1 bracket-count)
+		      (set! code (string-append code (read-string 1 in)))
+		      (begin 
+			(set! code (string-append code (read-string 1 in)))
+			(set! bracket-count (sub1 bracket-count))
+			(get-code))))
+		 (else
+		  (set! code (string-append code (read-string 1 in)))
+		  (get-code)))))))
+    (get-code))
+  (set! code (regexp-replace* "]" code " ] "))
+  (set! code (regexp-replace* "\\[" code "[ "))
+  (set! code (regexp-replace* "'\\(" code "(list "))
+  (set! code (regexp-replace* "\\)" code " ) "))
+  (set! code (regexp-replace* "\\(" code "( "))
+  (set! code (regexp-replace* "]" code ")"))
+  (set! code (regexp-replace* "\\[" code "#("))
+  code)
 
 (define (parsed-list in)
   (define bracket-count 1)
@@ -151,6 +110,8 @@
   (set! code (regexp-replace* "'\\(" code "(list "))
   (set! code (regexp-replace* "\\)" code " ) "))
   (set! code (regexp-replace* "\\(" code "( "))
+  (set! code (regexp-replace* "]" code ")"))
+  (set! code (regexp-replace* "\\[" code "#("))
 
   (for/list ((element (regexp-split #rx" +" code)))
     (cond
