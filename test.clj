@@ -1,4 +1,4 @@
-#lang reader "clojure.rkt"
+#lang clojure
 (require rackunit)
 
 (defn factorial [n]
