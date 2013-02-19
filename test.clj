@@ -43,3 +43,11 @@
           (* (twice y) 3))]
   (println "Twice 15 = " (twice 15))
   (println "Six times 15 = " (six-times 15)))
+
+(check-equal? (true? true) #t)
+(check-equal? (true? 1) #f)
+(check-equal? (true? (= 1 1)) #t)
+(check-equal? (false? false) #t)
+(check-equal? (false? true) #f)
+(check-equal? (false? nil) #f)
+(check-equal? (false? "foo") #f)

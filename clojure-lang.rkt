@@ -116,15 +116,29 @@
     ((_ '(a ...))
      (cdr '(a ...)))))
 
+(define true? 
+  (lambda (x)
+    (cond
+     ((equal? x #t) #t)
+     (else #f))))
+
+(define false? 
+  (lambda (x)
+    (cond
+     ((equal? x #f) #t)
+     (else #f))))
+
 (provide println
-         str
 	 vec
 	 fn
 	 get
 	 pop
 	 conj
 	 defn
+	 false?
          letfn
+         str
+	 true?
          (except-out (all-from-out racket)
 		     add1
                      begin
