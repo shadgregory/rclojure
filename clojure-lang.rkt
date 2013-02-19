@@ -24,12 +24,9 @@
     ((_ test then else)
      (if test then else))))
 
-(define-syntax-rule (clojure:do mexpr ...)
-  (begin
-    mexpr ...))
+(define-syntax-rule (clojure:do mexpr ...) (begin mexpr ...))
 
-(define-syntax-rule (vec a ...)
-  (vector a ...))
+(define-syntax-rule (vec a ...) (vector a ...))
 
 (define-syntax-rule (get vec key)
   (cond
@@ -37,8 +34,7 @@
    (else
     (vector-ref vec key))))
 
-(define-syntax-rule (clojure:def id expr)
-  (define id expr))
+(define-syntax-rule (clojure:def id expr) (define id expr))
 
 (define-syntax-rule (fn #(arg ...) body ...)
   (#%plain-lambda (arg ...)
@@ -165,6 +161,7 @@
           (clojure:let let)
 	  (vector-ref nth)
           (null nil)
+	  (null? nil?)
 	  (sub1 dec)
 	  (add1 inc)
 	  (remainder rem)
