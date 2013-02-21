@@ -58,3 +58,8 @@
 (check-equal? (nil? nil) #t)
 (check-equal? (nil? 0) #f)
 (check-equal? (nil? false) #f)
+(check-equal? (reduce + [1 2 3 4 5]) 15)
+(check-equal? (reduce + []) 0)
+(check-equal? (reduce + 1 []) 1)
+(check-equal? (reduce + 1 [2 3]) 6)
+

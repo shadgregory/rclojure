@@ -124,6 +124,15 @@
      ((equal? x #f) #t)
      (else #f))))
 
+(define-syntax reduce
+  (syntax-rules ()
+    ((_ proc #(e ...))
+     (foldl proc 0 (list e ...)))
+    ((_ proc val #(e ...))
+     (foldl proc 0 (list val e ...))
+     )
+    ))
+
 (provide println
 	 vec
 	 fn
@@ -133,6 +142,7 @@
 	 defn
 	 false?
          letfn
+	 reduce
          str
 	 true?
          (except-out (all-from-out racket)
