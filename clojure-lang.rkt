@@ -129,9 +129,15 @@
     ((_ proc #(e ...))
      (foldl proc 0 (list e ...)))
     ((_ proc val #(e ...))
-     (foldl proc 0 (list val e ...))
-     )
-    ))
+     (foldl proc 0 (list val e ...)))
+    ((_ proc coll)
+     (cond
+      ((vector? coll)
+       (foldl proc 0 (vector->list coll)))))
+    ((_ proc val coll)
+     (cond
+      ((vector? coll)
+       (foldl proc 0 (cons val (vector->list coll))))))))
 
 (provide println
 	 vec

@@ -59,7 +59,10 @@
 (check-equal? (nil? 0) #f)
 (check-equal? (nil? false) #f)
 (check-equal? (reduce + [1 2 3 4 5]) 15)
+(def my-coll [1 2 3 4 5])
+(check-equal? (reduce + my-coll) 15)
 (check-equal? (reduce + []) 0)
 (check-equal? (reduce + 1 []) 1)
 (check-equal? (reduce + 1 [2 3]) 6)
-
+(def my-vec [2 3])
+(check-equal? (reduce + 1 my-vec) 6)

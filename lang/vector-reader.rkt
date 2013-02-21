@@ -124,4 +124,3 @@
      ((equal? element ")") element)
      ((equal? element "(") element)
      (else (string->symbol element)))))
-
