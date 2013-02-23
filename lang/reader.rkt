@@ -1,5 +1,6 @@
 #lang s-exp syntax/module-reader
-"clojure-lang.rkt"
+clojure
+
 #:read clj:read
 #:read-syntax clj:read-syntax
 #:wrapper1 (lambda (t)
