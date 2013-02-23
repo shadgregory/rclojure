@@ -28,11 +28,17 @@
 
 (define-syntax-rule (vec a ...) (vector a ...))
 
-(define-syntax-rule (get vec key)
+(define-syntax-rule (get coll key)
   (cond
-   ((> key (sub1 (vector-length vec))) null)
-   (else
-    (vector-ref vec key))))
+   ((vector? coll) 
+    (cond
+     ((> key (sub1 (vector-length coll))) null)
+     (else
+      (vector-ref coll key))))
+   ((hash? coll)
+    (hash-ref coll key)
+    )
+   ))
 
 (define-syntax-rule (clojure:def id expr) (define id expr))
 

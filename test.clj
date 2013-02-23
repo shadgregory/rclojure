@@ -29,6 +29,7 @@
   (check-equal? y 3))
 (check-equal? 2 (get [1 2 3] 1))
 (check-equal? nil (get [1 2 3] 5))
+(check-equal? 2 (get {:a 1 :b 2} 'b))
 (check-equal? 1 (rem 10 9))
 (check-equal? 0 (rem 2 2))
 (check-equal? 0 (mod 10 5))
@@ -66,3 +67,4 @@
 (check-equal? (reduce + 1 [2 3]) 6)
 (def my-vec [2 3])
 (check-equal? (reduce + 1 my-vec) 6)
+(check-equal? {:a 1 :b 2} (hash 'a 1 'b 2))
