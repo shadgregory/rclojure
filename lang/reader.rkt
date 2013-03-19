@@ -9,4 +9,4 @@ clojure
                             [read-curly-brace-as-paren #f]
                             [read-square-bracket-as-paren #f])
                (t)))
-(require (prefix-in clj: "vector-reader.rkt"))
+(require (prefix-in clj: "coll-reader.rkt"))

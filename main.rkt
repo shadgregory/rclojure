@@ -14,8 +14,17 @@
                  `(,str ...))
        (newline)))))
 
-(define-syntax-rule (str string1 ...)
-  (string-append string1 ...))
+(define-syntax str
+  (syntax-rules ()
+    ((_) "")
+    ((_ string1 . rest)
+     (cond
+       ((empty? string1)
+	(string-append "" (str . rest)))
+       ((number? string1)
+	(string-append (number->string string1) (str  . rest)))
+       (else
+	(string-append string1 (str . rest)))))))
 
 (define-syntax clojure:if
   (syntax-rules ()
@@ -36,9 +45,7 @@
      (else
       (vector-ref coll key))))
    ((hash? coll)
-    (hash-ref coll key)
-    )
-   ))
+    (hash-ref coll key))))
 
 (define-syntax-rule (clojure:def id expr) (define id expr))
 
