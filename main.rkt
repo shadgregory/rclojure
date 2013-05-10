@@ -86,14 +86,15 @@
   (let ()
     (clojure:inner-letfn (bindings ...) . body)))
 
+
 (define-syntax clojure:cond
-  (syntax-rules (:else)
-    ((_ :else else-expr)
+  (syntax-rules ()
+    ((_ 'else else-expr)
      (cond (else else-expr)))
-    ((_ e1 e2 e3 ... :else else-expr)
+    ((_ e1 e2 e3 ... 'else else-expr)
      (if (= 0 (modulo (length '(e1 e2 e3 ...)) 2))
          (if e1 e2
-             (clojure:cond e3 ... :else else-expr))
+             (clojure:cond e3 ... 'else else-expr))
          (raise-syntax-error #f "cond requires an even number of forms")))))
 
 (define-syntax conj
@@ -108,6 +109,23 @@
        (vector-append coll #(x ...)))
       ((list? coll)
        (append '(x ...) coll))))))
+
+(define-syntax -quote
+  (syntax-rules ()
+    ((_ #(e ...))
+     (vector e ...))
+    ((_ e e_1 ...)
+     (quote e))))
+
+(define nth
+  (case-lambda
+    [(coll position)
+     (sequence-ref coll position)]
+    [(coll position error-msg)
+     (if (or (= 0 (sequence-length coll)) 
+	     (> position (sequence-length coll)))
+	 error-msg
+	 (sequence-ref coll position))]))
 
 (define-syntax clojure:count
   (syntax-rules ()
@@ -161,6 +179,7 @@
 	 defn
 	 false?
          letfn
+	 nth
 	 reduce
          str
 	 true?
@@ -188,11 +207,11 @@
           (clojure:cond cond)
 	  (clojure:count count)
           (clojure:let let)
-	  (vector-ref nth)
           (null nil)
 	  (null? nil?)
 	  (sub1 dec)
 	  (add1 inc)
+	  (quote -quote)
 	  (remainder rem)
 	  (modulo mod)
 	  (vector-copy subvec)

@@ -68,3 +68,18 @@
 (def my-vec [2 3])
 (check-equal? (reduce + 1 my-vec) 6)
 (check-equal? {:a 1 :b 2} (hash 'a 1 'b 2))
+(check-equal? (nth ["a" "b" "c" "d"] 0) "a")
+(check-equal? (nth (list "a" "b" "c" "d") 0) "a")
+(check-equal? (nth ["a" "b" "c" "d"] 1) "b")
+(check-equal? (nth [] 0 "nothing found") "nothing found")
+(check-equal? (nth [0 1 2] 77 1337) 1337)
+(check-equal? (nth "Hello" 0) #\H)
+(check-equal? (nth '(1 2 3) 0) 1)
+(check-equal? (nth '(:alpha :bravo :charlie) 0) ':alpha)
+
+
+
+
+
+
+

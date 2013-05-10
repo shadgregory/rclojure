@@ -19,7 +19,10 @@
 (define (make-clj-readtable)
   (make-readtable (current-readtable)
 		  #\{ 'terminating-macro read-hash
-                  #\[ 'terminating-macro read-vector))
+                  #\[ 'terminating-macro read-vector
+		  #\: 'non-terminating-macro (lambda (ch in . _)
+					       (define body (read in))
+					       `(quote ,body))))
 
 (define read-hash
   (case-lambda
