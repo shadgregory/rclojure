@@ -1,5 +1,5 @@
 #lang s-exp syntax/module-reader
-clojure
+rclojure
 
 #:read clj:read
 #:read-syntax clj:read-syntax

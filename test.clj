@@ -1,4 +1,4 @@
-#lang clojure
+#lang rclojure
 (require rackunit)
 
 (defn factorial [n]
@@ -50,7 +50,7 @@
 (check-equal? (true? (= 1 1)) #t)
 (check-equal? (false? false) #t)
 (check-equal? (false? true) #f)
-(check-equal? (false? nil) #f)
+(check-equal? "no" (if nil "yes" "no"))
 (check-equal? (false? "foo") #f)
 (check-equal? (max 1 2 3 4 5) 5)
 (check-equal? (max 5 4 3 2 1) 5)
@@ -58,7 +58,6 @@
 (check-equal? (min 1 2 3 4 5) 1)
 (check-equal? (nil? nil) #t)
 (check-equal? (nil? 0) #f)
-(check-equal? (nil? false) #f)
 (check-equal? (reduce + [1 2 3 4 5]) 15)
 (def my-coll [1 2 3 4 5])
 (check-equal? (reduce + my-coll) 15)
@@ -68,6 +67,7 @@
 (def my-vec [2 3])
 (check-equal? (reduce + 1 my-vec) 6)
 (check-equal? {:a 1 :b 2} (hash 'a 1 'b 2))
+;; nth
 (check-equal? (nth ["a" "b" "c" "d"] 0) "a")
 (check-equal? (nth (list "a" "b" "c" "d") 0) "a")
 (check-equal? (nth ["a" "b" "c" "d"] 1) "b")
@@ -76,10 +76,3 @@
 (check-equal? (nth "Hello" 0) #\H)
 (check-equal? (nth '(1 2 3) 0) 1)
 (check-equal? (nth '(:alpha :bravo :charlie) 0) ':alpha)
-
-
-
-
-
-
-

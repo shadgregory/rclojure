@@ -21,7 +21,8 @@
 		  #\{ 'terminating-macro read-hash
                   #\[ 'terminating-macro read-vector
 		  #\: 'non-terminating-macro (lambda (ch in . _)
-					       (define body (read in))
+					       (define body (string->symbol (string-append ":" (symbol->string (read in)))))
+                                               ;; body is a symbol
 					       `(quote ,body))))
 
 (define read-hash

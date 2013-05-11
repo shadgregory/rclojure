@@ -5,6 +5,9 @@
 (define-namespace-anchor a)
 (define ns (namespace-anchor->namespace a))
 
+(define nil #f)
+(define (nil? v) (eq? v nil))
+
 (define-syntax println
   (syntax-rules ()
     ((_ str ...)
@@ -29,7 +32,7 @@
 (define-syntax clojure:if
   (syntax-rules ()
     ((_ test then)
-     (if test then null))
+     (if test then #f))
     ((_ test then else)
      (if test then else))))
 
@@ -41,7 +44,7 @@
   (cond
    ((vector? coll) 
     (cond
-     ((> key (sub1 (vector-length coll))) null)
+     ((> key (sub1 (vector-length coll))) #f)
      (else
       (vector-ref coll key))))
    ((hash? coll)
@@ -89,12 +92,12 @@
 
 (define-syntax clojure:cond
   (syntax-rules ()
-    ((_ 'else else-expr)
+    ((_ ':else else-expr)
      (cond (else else-expr)))
-    ((_ e1 e2 e3 ... 'else else-expr)
+    ((_ e1 e2 e3 ... ':else else-expr)
      (if (= 0 (modulo (length '(e1 e2 e3 ...)) 2))
          (if e1 e2
-             (clojure:cond e3 ... 'else else-expr))
+             (clojure:cond e3 ... ':else else-expr))
          (raise-syntax-error #f "cond requires an even number of forms")))))
 
 (define-syntax conj
@@ -179,6 +182,8 @@
 	 defn
 	 false?
          letfn
+         nil
+         nil?
 	 nth
 	 reduce
          str
@@ -198,6 +203,7 @@
                      let
 		     modulo
                      null
+                     null?
 		     remainder
 		     sub1
 		     vector-copy
@@ -207,8 +213,6 @@
           (clojure:cond cond)
 	  (clojure:count count)
           (clojure:let let)
-          (null nil)
-	  (null? nil?)
 	  (sub1 dec)
 	  (add1 inc)
 	  (quote -quote)
