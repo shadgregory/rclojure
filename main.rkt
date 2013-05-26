@@ -166,6 +166,12 @@
     ((_ '(a ...))
      (cdr '(a ...)))))
 
+(define spit
+  (lambda (filename content )
+    (let ((f (open-output-file filename #:exists 'replace)))
+      (write content f)
+      (close-output-port f))))
+
 (define true? 
   (lambda (x)
     (cond
@@ -208,6 +214,7 @@
          nil?
          nth
          reduce
+         spit
          str
          true?
          (except-out (all-from-out racket)
