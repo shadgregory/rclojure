@@ -22,12 +22,32 @@
     ((_) "")
     ((_ string1 . rest)
      (cond
-       ((empty? string1)
-	(string-append "" (str . rest)))
-       ((number? string1)
-	(string-append (number->string string1) (str  . rest)))
-       (else
-	(string-append string1 (str . rest)))))))
+      ((empty? string1)
+       (string-append "" (str . rest)))
+      ((number? string1)
+       (string-append (number->string string1) (str  . rest)))
+      (else
+       (string-append string1 (str . rest)))))))
+
+(define-syntax ->
+  (syntax-rules ()
+    ((_ x) x)
+    ((_ x (e e_1 ...))
+      (e x e_1 ...))
+    ((_ x e)
+      (-> x (e)))
+    ((_ x form form_1 ...)
+     (-> (-> x form) form_1 ...))))
+
+(define-syntax ->>
+  (syntax-rules ()
+    ((_ x) x)
+    ((_ x (e e_1 ...))
+      (e e_1 ... x))
+    ((_ x e)
+     (->> x (e)))
+    ((_ x form form_1 ...)
+     (->> (->> x form) form_1 ...))))
 
 (define-syntax clojure:if
   (syntax-rules ()
@@ -54,7 +74,7 @@
 
 (define-syntax-rule (fn #(arg ...) body ...)
   (#%plain-lambda (arg ...)
-		  (begin body ...)))
+                  (begin body ...)))
 
 (define-syntax-rule (defn id #(arg ...) body ...)
   (define id (fn #(arg ...) body ...)))
@@ -64,9 +84,9 @@
     ((_ (id v) . body)
      (let ((id v))
        (clojure:inner-let () . body)))
-     ((_ (id v id2 ...) . body)
-      (let ((id v))
-	(clojure:inner-let (id2 ...) . body)))
+    ((_ (id v id2 ...) . body)
+     (let ((id v))
+       (clojure:inner-let (id2 ...) . body)))
     ((_ () . body)
      (let () . body))))
 
@@ -126,9 +146,9 @@
      (sequence-ref coll position)]
     [(coll position error-msg)
      (if (or (= 0 (sequence-length coll)) 
-	     (> position (sequence-length coll)))
-	 error-msg
-	 (sequence-ref coll position))]))
+             (> position (sequence-length coll)))
+         error-msg
+         (sequence-ref coll position))]))
 
 (define-syntax clojure:count
   (syntax-rules ()
@@ -136,8 +156,8 @@
      (vector-length #(e ...)))
     ((_ coll)
      (if (string? coll)
-	 (length (string->list coll))
-	 (length coll)))))
+         (length (string->list coll))
+         (length coll)))))
 
 (define-syntax pop
   (syntax-rules ()
@@ -173,51 +193,53 @@
       ((vector? coll)
        (foldl proc 0 (cons val (vector->list coll))))))))
 
-(provide println
-	 vec
-	 fn
-	 get
-	 pop
-	 conj
-	 defn
-	 false?
+(provide ->
+         ->>
+         println
+         vec
+         fn
+         get
+         pop
+         conj
+         defn
+         false?
          letfn
          nil
          nil?
-	 nth
-	 reduce
+         nth
+         reduce
          str
-	 true?
+         true?
          (except-out (all-from-out racket)
-		     add1
+                     add1
                      begin
                      car
                      cdr
                      cond
-		     count
+                     count
                      display
-		     do
+                     do
                      if
                      lambda
-		     length
+                     length
                      let
-		     modulo
+                     modulo
                      null
                      null?
-		     remainder
-		     sub1
-		     vector-copy
-		     vector-ref)
+                     remainder
+                     sub1
+                     vector-copy
+                     vector-ref)
          (rename-out
           (clojure:do do)
           (clojure:cond cond)
-	  (clojure:count count)
+          (clojure:count count)
           (clojure:let let)
-	  (sub1 dec)
-	  (add1 inc)
-	  (quote -quote)
-	  (remainder rem)
-	  (modulo mod)
-	  (vector-copy subvec)
+          (sub1 dec)
+          (add1 inc)
+          (quote -quote)
+          (remainder rem)
+          (modulo mod)
+          (vector-copy subvec)
           (clojure:def def)
           (clojure:if if)))

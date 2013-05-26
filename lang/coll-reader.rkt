@@ -18,26 +18,26 @@
 
 (define (make-clj-readtable)
   (make-readtable (current-readtable)
-		  #\{ 'terminating-macro read-hash
+                  #\{ 'terminating-macro read-hash
                   #\[ 'terminating-macro read-vector
-		  #\: 'non-terminating-macro (lambda (ch in . _)
-					       (define body (string->symbol (string-append ":" (symbol->string (read in)))))
+                  #\: 'non-terminating-macro (lambda (ch in . _)
+                                               (define body (string->symbol (string-append ":" (symbol->string (read in)))))
                                                ;; body is a symbol
-					       `(quote ,body))))
+                                               `(quote ,body))))
 
 (define read-hash
   (case-lambda
-   [(ch in)
-    (hash-read in)]
-   [(ch in src line col pos)
-    (hash-read-syntax src in)]))
+    [(ch in)
+     (hash-read in)]
+    [(ch in src line col pos)
+     (hash-read-syntax src in)]))
 
 (define read-vector
   (case-lambda
-   [(ch in)
-    (vec-read in)]
-   [(ch in src line col pos)
-    (vec-read-syntax src in)]))
+    [(ch in)
+     (vec-read in)]
+    [(ch in src line col pos)
+     (vec-read-syntax src in)]))
 
 (define (vec-read in)
   (syntax->datum (vec-read-syntax #f in)))
@@ -75,23 +75,23 @@
   (define curly-count 1) 
   (define code "{")
   (letrec ((get-code 
-	    (lambda ()
-	      (let ((ch (peek-char in)))
-		(cond
-		 ((equal? ch #\{)
-		  (set! curly-count (add1 curly-count))
-		  (set! code (string-append code (read-string 1 in)))
-		  (get-code))
-		 ((equal? ch #\})
-		  (if (= 1 curly-count)
-		      (set! code (string-append code (read-string 1 in)))
-		      (begin 
-			(set! code (string-append code (read-string 1 in)))
-			(set! curly-count (sub1 curly-count))
-			(get-code))))
-		 (else
-		  (set! code (string-append code (read-string 1 in)))
-		  (get-code)))))))
+            (lambda ()
+              (let ((ch (peek-char in)))
+                (cond
+                 ((equal? ch #\{)
+                  (set! curly-count (add1 curly-count))
+                  (set! code (string-append code (read-string 1 in)))
+                  (get-code))
+                 ((equal? ch #\})
+                  (if (= 1 curly-count)
+                      (set! code (string-append code (read-string 1 in)))
+                      (begin 
+                        (set! code (string-append code (read-string 1 in)))
+                        (set! curly-count (sub1 curly-count))
+                        (get-code))))
+                 (else
+                  (set! code (string-append code (read-string 1 in)))
+                  (get-code)))))))
     (get-code))
   (set! code (regexp-replace* #rx":([^ \n\t\r])" code "'\\1"))
   (set! code (regexp-replace* "{" code "(hash "))
@@ -103,23 +103,23 @@
   (define bracket-count 1) 
   (define code "[")
   (letrec ((get-code 
-	    (lambda ()
-	      (let ((ch (peek-char in)))
-		(cond
-		 ((equal? ch #\[)
-		  (set! bracket-count (add1 bracket-count))
-		  (set! code (string-append code (read-string 1 in)))
-		  (get-code))
-		 ((equal? ch #\])
-		  (if (= 1 bracket-count)
-		      (set! code (string-append code (read-string 1 in)))
-		      (begin 
-			(set! code (string-append code (read-string 1 in)))
-			(set! bracket-count (sub1 bracket-count))
-			(get-code))))
-		 (else
-		  (set! code (string-append code (read-string 1 in)))
-		  (get-code)))))))
+            (lambda ()
+              (let ((ch (peek-char in)))
+                (cond
+                 ((equal? ch #\[)
+                  (set! bracket-count (add1 bracket-count))
+                  (set! code (string-append code (read-string 1 in)))
+                  (get-code))
+                 ((equal? ch #\])
+                  (if (= 1 bracket-count)
+                      (set! code (string-append code (read-string 1 in)))
+                      (begin 
+                        (set! code (string-append code (read-string 1 in)))
+                        (set! bracket-count (sub1 bracket-count))
+                        (get-code))))
+                 (else
+                  (set! code (string-append code (read-string 1 in)))
+                  (get-code)))))))
     (get-code))
   (set! code (regexp-replace* "]" code " ] "))
   (set! code (regexp-replace* "\\[" code "[ "))
@@ -134,23 +134,23 @@
   (define bracket-count 1)
   (define code "[")
   (letrec ((get-code 
-	    (lambda ()
-	      (let ((ch (peek-char in)))
-		(cond
-		 ((equal? ch #\[)
-		  (set! bracket-count (add1 bracket-count))
-		  (set! code (string-append code (read-string 1 in)))
-		  (get-code))
-		 ((equal? ch #\])
-		  (if (= 1 bracket-count)
-		      (set! code (string-append code (read-string 1 in)))
-		      (begin 
-			(set! code (string-append code (read-string 1 in)))
-			(set! bracket-count (sub1 bracket-count))
-			(get-code))))
-		 (else
-		  (set! code (string-append code (read-string 1 in)))
-		  (get-code)))))))
+            (lambda ()
+              (let ((ch (peek-char in)))
+                (cond
+                 ((equal? ch #\[)
+                  (set! bracket-count (add1 bracket-count))
+                  (set! code (string-append code (read-string 1 in)))
+                  (get-code))
+                 ((equal? ch #\])
+                  (if (= 1 bracket-count)
+                      (set! code (string-append code (read-string 1 in)))
+                      (begin 
+                        (set! code (string-append code (read-string 1 in)))
+                        (set! bracket-count (sub1 bracket-count))
+                        (get-code))))
+                 (else
+                  (set! code (string-append code (read-string 1 in)))
+                  (get-code)))))))
     (get-code))
   (set! code (regexp-replace* "]" code " ] "))
   (set! code (regexp-replace* "\\[" code "[ "))

@@ -76,3 +76,18 @@
 (check-equal? (nth "Hello" 0) #\H)
 (check-equal? (nth '(1 2 3) 0) 1)
 (check-equal? (nth '(:alpha :bravo :charlie) 0) ':alpha)
+(check-equal?
+ (-> "a b c d"
+     string-upcase
+     (string-replace "A" "X")
+     (string-split " ")
+     first)
+ "X")
+
+(check-equal?
+ (->> 5 (+ 3) (/ 2) (- 1))
+ (/ 3 4))
+
+(check-equal?
+  (->> 1 ((fn [x] (+ x 1))))
+  2)
