@@ -142,13 +142,13 @@
 
 (define nth
   (case-lambda
-    [(coll position)
-     (sequence-ref coll position)]
-    [(coll position error-msg)
-     (if (or (= 0 (sequence-length coll)) 
-             (> position (sequence-length coll)))
-         error-msg
-         (sequence-ref coll position))]))
+    ((coll position)
+     (sequence-ref coll position))
+    ((coll position error-msg)
+         (if (or (= 0 (sequence-length coll)) 
+                 (> position (sequence-length coll)))
+             error-msg
+             (sequence-ref coll position)))))
 
 (define-syntax clojure:count
   (syntax-rules ()
